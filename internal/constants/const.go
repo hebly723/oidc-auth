@@ -43,3 +43,15 @@ const (
 	CasdoorRefreshTokenURI = "/api/login/oauth/refresh_token"
 	CasdoorMergeURI        = "/api/identity/merge"
 )
+
+// Invite code related constants
+const (
+	InviteCodeLength = 8                                      // 邀请码长度
+	InviteCodeChars  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" // 邀请码字符集
+)
+
+// Invite code validation constants
+const (
+	InviteCodeValidDays   = 30 // 邀请码有效期（天）
+	UserRegisterValidDays = 1  // 用户注册后可使用邀请码的有效期（天）
+)

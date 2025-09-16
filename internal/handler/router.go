@@ -9,10 +9,11 @@ import (
 )
 
 type Server struct {
-	ServerPort string
-	BaseURL    string
-	HTTPClient *http.Client
-	IsPrivate  bool
+	ServerPort        string
+	BaseURL           string
+	HTTPClient        *http.Client
+	IsPrivate         bool
+	InviteCodeHandler *InviteCodeHandler
 }
 
 type ParameterCarrier struct {
@@ -24,11 +25,17 @@ type ParameterCarrier struct {
 	UriScheme     string `form:"uri_scheme"`
 	PluginVersion string `form:"plugin_version"`
 	VscodeVersion string `form:"vscode_version"`
+	InviteCode    string `form:"invite_code"`
 }
 
 func (s *Server) SetupRouter(r *gin.Engine) {
 	r.Use(middleware.SecurityHeaders())
 	r.Use(middleware.RequestLogger())
+	
+	// 注入邀请码处理器中间件
+	if s.InviteCodeHandler != nil {
+		r.Use(middleware.InjectInviteCodeHandler(s.InviteCodeHandler))
+	}
 
 	pluginOauthServer := r.Group("/oidc-auth/api/v1/plugin",
 		middleware.SetPlatform("plugin"),
@@ -49,6 +56,14 @@ func (s *Server) SetupRouter(r *gin.Engine) {
 		webOauthServer.GET("bind/account/callback", s.bindAccountCallback)
 		webOauthServer.GET("userinfo", s.userInfoHandler)
 	}
+	
+	// 邀请码相关API
+	inviteCodeAPI := r.Group("/oidc-auth/api/v1/invite")
+	{
+		inviteCodeAPI.POST("generate", s.generateInviteCodeHandler)
+		inviteCodeAPI.GET("list", s.getInviteCodesHandler)
+	}
+	
 	r.POST("/oidc-auth/api/v1/send/sms", s.SMSHandler)
 	health := r.Group("/health")
 	{

@@ -147,3 +147,4 @@ log:
 
   # Compress old log files to save disk space
   compress: true  # Compress old logs
+

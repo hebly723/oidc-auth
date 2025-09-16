@@ -13,6 +13,7 @@ import (
 	"github.com/zgsm-ai/oidc-auth/internal/providers"
 	"github.com/zgsm-ai/oidc-auth/internal/repository"
 	"github.com/zgsm-ai/oidc-auth/pkg/errs"
+	"github.com/zgsm-ai/oidc-auth/pkg/log"
 	"github.com/zgsm-ai/oidc-auth/pkg/response"
 )
 
@@ -23,6 +24,7 @@ type requestQuery struct {
 	UriScheme     string `form:"uri_scheme"`
 	PluginVersion string `form:"plugin_version"`
 	VscodeVersion string `form:"vscode_version"`
+	InviteCode    string `form:"invite_code"`
 }
 
 func (r *requestQuery) validLoginParams(isPlugin bool) error {
@@ -67,6 +69,7 @@ func (s *Server) loginHandler(c *gin.Context) {
 		UriScheme:     queryParams.UriScheme,
 		PluginVersion: queryParams.PluginVersion,
 		State:         queryParams.State,
+		InviteCode:    queryParams.InviteCode,
 	})
 	if err != nil {
 		response.JSONError(c, http.StatusInternalServerError, errs.ErrDataEncryption,
@@ -165,6 +168,20 @@ func (s *Server) callbackHandler(c *gin.Context) {
 		return
 	}
 	user.Devices[0].State = state
+
+	// 处理邀请码逻辑
+	if parameterCarrier.InviteCode != "" {
+		// 从context中获取邀请码处理器（需要在中间件中设置）
+		if inviteCodeHandler, exists := c.Get("inviteCodeHandler"); exists {
+			if handler, ok := inviteCodeHandler.(*InviteCodeHandler); ok {
+				if err := handler.ValidateInviteCode(c, parameterCarrier.InviteCode, user.ID.String(), user); err != nil {
+					log.Error(ctx, "Failed to process invite code: %v", err)
+					// 邀请码处理失败不影响登录流程，只记录错误
+				}
+			}
+		}
+	}
+
 	err = providerInstance.Update(ctx, user)
 	if err != nil {
 		response.HandleError(c, http.StatusInternalServerError, errs.ErrUpdateInfo,

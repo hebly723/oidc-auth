@@ -42,6 +42,16 @@ var allowedFields = map[string]map[string]bool{
 		"purpose": true,
 		"is_used": true,
 	},
+	"InviteCode": {
+		"id":      true,
+		"code":    true,
+		"user_id": true,
+	},
+	"InviteCodeUsage": {
+		"id":             true,
+		"invite_code_id": true,
+		"user_id":        true,
+	},
 }
 
 func ValidateFieldName(modelName, fieldName string) error {
@@ -315,4 +325,64 @@ func (d *Database) RemoveSyncLock(ctx context.Context, models any) error {
 		}
 		return nil
 	})
+}
+
+// CreateInviteCode 创建邀请码
+func (d *Database) CreateInviteCode(ctx context.Context, inviteCode *InviteCode) error {
+	return d.withTransaction(ctx, func(tx *gorm.DB) error {
+		if err := tx.Create(inviteCode).Error; err != nil {
+			return fmt.Errorf("failed to create invite code: %w", err)
+		}
+		return nil
+	})
+}
+
+// GetInviteCodeByCode 根据邀请码获取邀请码信息
+func (d *Database) GetInviteCodeByCode(ctx context.Context, code string) (*InviteCode, error) {
+	var inviteCode InviteCode
+	if err := d.db.WithContext(ctx).
+		Where("code = ?", code).
+		First(&inviteCode).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to query invite code: %w", err)
+	}
+	return &inviteCode, nil
+}
+
+// GetInviteCodesByUserID 根据用户ID获取邀请码列表
+func (d *Database) GetInviteCodesByUserID(ctx context.Context, userID string) ([]InviteCode, error) {
+	var inviteCodes []InviteCode
+	if err := d.db.WithContext(ctx).
+		Where("user_id = ?", userID).
+		Order("created_at DESC").
+		Find(&inviteCodes).Error; err != nil {
+		return nil, fmt.Errorf("failed to query invite codes: %w", err)
+	}
+	return inviteCodes, nil
+}
+
+// CreateInviteCodeUsage 创建邀请码使用记录
+func (d *Database) CreateInviteCodeUsage(ctx context.Context, usage *InviteCodeUsage) error {
+	return d.withTransaction(ctx, func(tx *gorm.DB) error {
+		if err := tx.Create(usage).Error; err != nil {
+			return fmt.Errorf("failed to create invite code usage: %w", err)
+		}
+		return nil
+	})
+}
+
+// GetInviteCodeUsageByUserID 检查用户是否已使用过邀请码
+func (d *Database) GetInviteCodeUsageByUserID(ctx context.Context, userID string) (*InviteCodeUsage, error) {
+	var usage InviteCodeUsage
+	if err := d.db.WithContext(ctx).
+		Where("user_id = ?", userID).
+		First(&usage).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to query invite code usage: %w", err)
+	}
+	return &usage, nil
 }

@@ -61,3 +61,22 @@ type Device struct {
 	DeviceCode       string    `json:"device_code"`
 	TokenProvider    string    `gorm:"size:20" json:"token_provider"`
 }
+
+// InviteCode 邀请码表
+type InviteCode struct {
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	Code      string    `gorm:"uniqueIndex;not null;size:32" json:"code"`
+	UserID    uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
+	CreatedAt time.Time `gorm:"type:timestamptz;not null" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:timestamptz;not null" json:"updated_at"`
+}
+
+// InviteCodeUsage 邀请码使用记录表
+type InviteCodeUsage struct {
+	ID           uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	InviteCodeID uuid.UUID `gorm:"type:uuid;not null;index" json:"invite_code_id"`
+	UserID       uuid.UUID `gorm:"type:uuid;not null;index" json:"user_id"`
+	UsedAt       time.Time `gorm:"type:timestamptz;not null" json:"used_at"`
+	CreatedAt    time.Time `gorm:"type:timestamptz;not null" json:"created_at"`
+	UpdatedAt    time.Time `gorm:"type:timestamptz;not null" json:"updated_at"`
+}

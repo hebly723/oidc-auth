@@ -136,13 +136,21 @@ var serveCmd = &cobra.Command{
 		github.Owner, github.Repo = syncStar.Owner, syncStar.Repo
 		go syncStar.StarSyncTimer(ctx)
 
+		// 初始化邀请码服务
+		db := repository.GetDB()
+		inviteCodeSvc := service.NewInviteCodeService(db)
+
+		// 初始化邀请码处理器
+		inviteCodeHandler := handler.NewInviteCodeHandler(inviteCodeSvc, db)
+
 		go func() {
 			log.Info(nil, "Starting server...")
 			server := handler.Server{
-				ServerPort: globalConfig.Server.ServerPort,
-				BaseURL:    globalConfig.Server.BaseURL,
-				HTTPClient: initHTTPClient(nil),
-				IsPrivate:  globalConfig.Server.IsPrivate,
+				ServerPort:        globalConfig.Server.ServerPort,
+				BaseURL:           globalConfig.Server.BaseURL,
+				HTTPClient:        initHTTPClient(nil),
+				IsPrivate:         globalConfig.Server.IsPrivate,
+				InviteCodeHandler: inviteCodeHandler,
 			}
 			if err := server.StartServer(); err != nil {
 				log.Error(nil, "Server error: %v", err)

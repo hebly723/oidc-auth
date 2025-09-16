@@ -95,6 +95,8 @@ func newDatabaseImpl(cfg *DBConfig) (*Database, error) {
 	if err := db_.AutoMigrate(
 		&AuthUser{},
 		&SyncLock{},
+		&InviteCode{},
+		&InviteCodeUsage{},
 	); err != nil {
 		return nil, fmt.Errorf("failed to auto migrate: %v", err)
 	}
@@ -244,4 +246,9 @@ func (d *Database) Close() error {
 	}
 
 	return sqlDB.Close()
+}
+
+// GetDB 返回底层的 gorm.DB 实例
+func (d *Database) GetDB() *gorm.DB {
+	return d.db
 }
