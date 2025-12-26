@@ -130,6 +130,7 @@ func (s *CasdoorProvider) Update(ctx context.Context, data *repository.AuthUser)
 	existingUser.Company = data.Company
 	existingUser.Phone = data.Phone
 	existingUser.Vip = data.Vip
+	existingUser.VipExpire = data.VipExpire
 	existingUser.EmployeeNumber = data.EmployeeNumber
 	existingUser.ID = data.ID
 

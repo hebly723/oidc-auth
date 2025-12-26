@@ -200,6 +200,7 @@ func (s *Server) bindAccountCallback(c *gin.Context) {
 	userMarge.GithubStar = coalesceString(userMarge.GithubStar, otherUser.GithubStar)
 	if otherUser.Vip > userMarge.Vip {
 		userMarge.Vip = otherUser.Vip
+		userMarge.VipExpire = otherUser.VipExpire
 	}
 	userMarge.InviteCode = coalesceString(userMarge.InviteCode, otherUser.InviteCode)
 	if userMarge.InviterID == nil || *userMarge.InviterID == uuid.Nil {
@@ -292,6 +293,8 @@ func (s *Server) userInfoHandler(c *gin.Context) {
 		"githubName": user.GithubName,
 		"isPrivate":  s.IsPrivate,
 		"isStar":     isStar,
+		"vip":        user.Vip,
+		"vipExpire":  user.VipExpire,
 	}
 
 	response.JSONSuccess(c, "", data)

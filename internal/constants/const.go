@@ -56,3 +56,9 @@ const (
 const (
 	QuotaMergeURI = "/quota-manager/api/v1/quota/merge"
 )
+
+// System API authentication constants
+const (
+	// System API endpoint path for external services
+	SystemAPIPath = "/oidc-auth/api/v1/system"
+)

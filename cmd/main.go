@@ -147,6 +147,7 @@ var serveCmd = &cobra.Command{
 				BaseURL:    globalConfig.Server.BaseURL,
 				HTTPClient: initHTTPClient(nil),
 				IsPrivate:  globalConfig.Server.IsPrivate,
+				APIKey:     globalConfig.Server.APIKey,
 			}
 			if err := server.StartServer(); err != nil {
 				log.Error(nil, "Server error: %v", err)

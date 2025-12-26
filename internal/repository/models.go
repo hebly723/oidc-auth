@@ -29,6 +29,7 @@ type AuthUser struct {
 	GithubID         string     `gorm:"size:100;" json:"github_id"`
 	GithubName       string     `gorm:"size:100" json:"github_name"`
 	Vip              int        `gorm:"default:0" json:"vip"`
+	VipExpire        *time.Time `gorm:"type:timestamptz" json:"vip_expire"`
 	Phone            string     `gorm:"size:20" json:"phone"`
 	Email            string     `gorm:"size:100;index" json:"email"`
 	Password         string     `gorm:"size:100" json:"password"`

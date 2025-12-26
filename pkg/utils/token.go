@@ -178,6 +178,8 @@ func GenerateTokenPairByUser(user *repository.AuthUser, deviceIndex int) (*Token
 		"user_code":   user.UserCode,
 		"device_code": device.DeviceCode,
 		"key":         "user",
+		"vip":         user.Vip,
+		"vip_expire":  user.VipExpire,
 	}
 
 	tokenOptions := TokenOptions{

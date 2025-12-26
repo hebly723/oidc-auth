@@ -13,6 +13,7 @@ type Server struct {
 	BaseURL    string
 	HTTPClient *http.Client
 	IsPrivate  bool
+	APIKey  string
 }
 
 type ParameterCarrier struct {
@@ -51,6 +52,14 @@ func (s *Server) SetupRouter(r *gin.Engine) {
 		webOauthServer.GET("login", s.webLoginHandler)
 		webOauthServer.GET("login/callback", s.webLoginCallbackHandler)
 		webOauthServer.GET("invite-code", s.getUserInviteCodeHandler)
+	}
+
+	// System API endpoints for external service calls
+	systemServer := r.Group("/oidc-auth/api/v1/system",
+		middleware.SystemAuth(s.APIKey),
+	)
+	{
+		systemServer.PUT("user/vip", s.updateVipHandler)
 	}
 	r.POST("/oidc-auth/api/v1/send/sms", s.SMSHandler)
 	health := r.Group("/health")

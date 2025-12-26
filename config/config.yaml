@@ -9,6 +9,9 @@ server:
   # Intranet/Extranet access
   isPrivate: "false"
 
+  # System API key for external service communication
+  APIKey: "123456"
+
   http:
     # Total request timeout. Format: "60s", "5m", "1h". 0 means no timeout.
     timeout: "60s"

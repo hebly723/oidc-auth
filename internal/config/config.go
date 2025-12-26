@@ -28,6 +28,7 @@ type Server struct {
 	BaseURL    string            `json:"baseURL" mapstructure:"baseURL"`
 	HTTP       *HTTPClientConfig `json:"http" mapstructure:"http" validate:"required"`
 	IsPrivate  bool              `json:"isPrivate" mapstructure:"isPrivate"`
+	APIKey     string            `json:"APIKey" mapstructure:"APIKey"`
 }
 
 type HTTPClientConfig struct {

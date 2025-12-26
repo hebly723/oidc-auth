@@ -25,6 +25,8 @@ var allowedFields = map[string]map[string]bool{
 		"provider":    true,
 		"phone":       true,
 		"invite_code": true,
+		"vip":         true,
+		"vip_expire":  true,
 	},
 	"StarUser": {
 		"id":          true,
